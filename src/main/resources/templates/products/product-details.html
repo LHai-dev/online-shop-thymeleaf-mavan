@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Product Details</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 lg:px-8">
+    <div class="mt-4 grid gap-4 lg:grid-cols-12">
+        <!-- Main Image Slider -->
+        <div class="lg:col-span-7 lg:row-span-3 lg:row-start-1 relative">
+            <h2 class="sr-only">Images</h2>
+            <div class="relative">
+                <img
+                        id="product-image"
+                        loading="eager"
+                        width="700"
+                        height="700"
+                        decoding="async"
+                        data-nimg="1"
+                        class="w-full rounded-lg bg-neutral-100 object-cover object-center transition-opacity"
+                        sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 700px"
+                        th:src="@{'/file/' + ${images[0]}}"
+                        style="color: transparent"
+                        alt="Product Image"
+                />
+
+                <!-- Previous Button -->
+                <button
+                        id="prev-button"
+                        class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                    &larr;
+                </button>
+
+                <!-- Next Button -->
+                <button
+                        id="next-button"
+                        class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                    &rarr;
+                </button>
+            </div>
+        </div>
+
+
+        <div class="lg:col-span-5 lg:col-start-8">
+            <h1 class="text-3xl font-bold leading-none tracking-tight text-foreground" th:text="${product.name}">Product Name</h1>
+            <p class="mt-2 text-2xl font-medium leading-none tracking-tight text-foreground/70" th:text="'$' + ${product.price}">Price</p>
+        </div>
+
+        <div class="grid gap-8 lg:col-span-5">
+            <section>
+                <h2 class="sr-only">Description</h2>
+                <div class="prose text-secondary-foreground">
+                    <p th:text="${product.description}">
+                        Show off your wild side with this unique white and brown striped t-shirt. Made from 100% organic
+                        cotton, it offers both comfort and durability. Its eye-catching design makes it perfect for any casual
+                        occasion.
+                    </p>
+                </div>
+            </section>
+
+            <!--        &lt;!&ndash; Color and Size Selection &ndash;&gt;-->
+            <!--        <div class="grid gap-4">-->
+            <!--            <div class="grid gap-2">-->
+            <!--                <p class="text-lg font-semibold" id="color-variant-label">Choose Color</p>-->
+            <!--                <ul role="list" class="flex flex-wrap gap-2" aria-labelledby="color-variant-label">-->
+            <!--                    <li th:each="variant : ${product.variants}">-->
+            <!--                        <button-->
+            <!--                                th:classappend="${variant.color == selectedVariant.color} ? 'border-black bg-neutral-50 font-medium' : 'border-gray-300'"-->
+            <!--                                th:aria-selected="${variant.color == selectedVariant.color}"-->
+            <!--                                th:onclick="|handleVariantChange(${variant})|"-->
+            <!--                                class="flex cursor-pointer items-center justify-center gap-2 rounded-md border p-2 transition-colors hover:bg-neutral-100">-->
+            <!--                            <span class="w-6 h-6 rounded-full" th:style="'background-color:' + ${variant.color.toLowerCase()}"></span>-->
+            <!--                            <span th:text="${variant.color}">Color</span>-->
+            <!--                        </button>-->
+            <!--                    </li>-->
+            <!--                </ul>-->
+            <!--            </div>-->
+
+            <!--            <div class="grid gap-2">-->
+            <!--                <p class="text-lg font-semibold" id="size-variant-label">Choose Size</p>-->
+            <!--                <ul role="list" class="flex flex-wrap gap-2" aria-labelledby="size-variant-label">-->
+            <!--                    <li th:each="variant : ${product.variants}"-->
+            <!--                        th:if="${variant.color == selectedVariant.color && variant.size != null}">-->
+            <!--                        <button-->
+            <!--                                th:classappend="${variant.size == selectedVariant.size} ? 'border-black bg-neutral-50 font-medium' : 'border-gray-300'"-->
+            <!--                                th:aria-selected="${variant.size == selectedVariant.size}"-->
+            <!--                                th:onclick="|handleVariantChange(${variant})|"-->
+            <!--                                class="flex cursor-pointer items-center justify-center gap-2 rounded-md border p-2 transition-colors">-->
+            <!--                            <span th:text="${variant.size}">Size</span>-->
+            <!--                        </button>-->
+            <!--                    </li>-->
+            <!--                </ul>-->
+            <!--            </div>-->
+            <!--        </div>-->
+
+            <button
+                    class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 text-primary-foreground shadow hover:bg-primary/90 h-10 px-8 w-full rounded-full text-lg"
+                    type="submit"
+                    th:onclick="|window.location.href='https://t.me/lunlimhaist10'|"
+            >
+                Telegram to buy
+            </button>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    // Assuming 'images' is a Thymeleaf variable holding an array of image names
+    var imagesString = /*[[${images != null ? #strings.arrayJoin(images, '","') : ""}]]*/ "";
+
+    // Split the string into an array of filenames
+    var imagesArray = imagesString.split('","');
+
+    // Map over the array to prepend "/file/" to each filename
+    var imagesWithPath = imagesArray.map(function(image) {
+        return "/file/" + image;
+    });
+
+    console.log("Thymeleaf-generated images array:", imagesWithPath);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!Array.isArray(imagesWithPath) || imagesWithPath.length === 0) {
+            console.error("No images found.");
+            return;
+        }
+        let imageIndex = 0;
+
+        // Function to update the image source in the slider
+        function updateImage() {
+            const imageElement = document.getElementById('product-image');
+            if (imageElement) {
+                imageElement.src = imagesWithPath[imageIndex];
+                console.log("Displaying image:", imagesWithPath[imageIndex]);
+            } else {
+                console.error("Image element not found.");
+            }
+        }
+
+        // Event listeners for Previous and Next buttons
+        document.getElementById('prev-button').addEventListener('click', function () {
+            imageIndex = (imageIndex > 0) ? imageIndex - 1 : imagesWithPath.length - 1;
+            updateImage();
+        });
+
+        document.getElementById('next-button').addEventListener('click', function () {
+            imageIndex = (imageIndex < imagesWithPath.length - 1) ? imageIndex + 1 : 0;
+            updateImage();
+        });
+
+        // Initial image display
+        updateImage();
+
+        // Auto-slide functionality
+        setInterval(function() {
+            imageIndex = (imageIndex < imagesWithPath.length - 1) ? imageIndex + 1 : 0;
+            updateImage();
+        }, 3000); // Change image every 3 seconds
+    });
+    /*]]>*/
+</script>
+
+
+
+

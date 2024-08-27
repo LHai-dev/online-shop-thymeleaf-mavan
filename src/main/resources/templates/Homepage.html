@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Products</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 lg:px-8">
+    <section class="rounded bg-neutral-100 py-8 sm:py-12">
+        <div class="mx-auto grid grid-cols-1 items-center justify-items-center gap-8 px-8 sm:px-16 md:grid-cols-2">
+            <div class="max-w-md space-y-4">
+                <h2 class="text-balance text-3xl font-bold tracking-tight md:text-4xl">Discover our Curated Collection</h2>
+                <p class="text-pretty text-neutral-600">
+                    Explore our carefully selected products for your home and lifestyle.
+                </p>
+                <a th:href="@{/}" class="inline-flex mt-3 h-10 items-center justify-center rounded-full bg-black px-6 font-medium text-white transition-colors hover:bg-black/90 focus:outline-none focus:ring-1 focus:ring-neutral-950">
+                    Shop Now
+                </a>
+
+            </div>
+            <img
+                    alt="Cup of coffee"
+                    loading="eager"
+                    width="450"
+                    height="450"
+                    decoding="async"
+                    class="rounded"
+                    style="color: transparent; object-fit: cover;"
+                    sizes="(max-width: 640px) 70vw, 450px"
+                    th:src="@{../file/199a8ca4-e719-4f35-a527-a8b12ddcb7a6_v-1.jpg}"
+            />
+        </div>
+    </section>
+
+    <ul class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <li th:each="product : ${products}" class="group">
+            <a th:href="@{/products/{id}(id=${product.id})}">
+                <article class="overflow-hidden rounded border bg-white">
+                    <div class="aspect-square w-full overflow-hidden bg-neutral-100">
+                        <img th:src="@{'/file/' + ${product.images[0]}}"
+                             th:alt="${product.name}"
+                             class="group-hover:rotate hover-perspective w-full bg-neutral-100 object-cover object-center transition-opacity group-hover:opacity-75"
+                        />
+                    </div>
+                    <div class="p-4">
+                        <h5 class="text-lg font-semibold text-neutral-700">
+                            <span th:text="${product.name.length() > 36 ? product.name.substring(0, 35) + '...' : product.name}"></span>
+                        </h5>
+                        <footer class="text-sm font-medium text-neutral-900">
+                            <p th:text="'$' + ${product.price}"></p>
+                        </footer>
+                    </div>
+                </article>
+            </a>
+        </li>
+    </ul>
+
+</div>
+</body>
+</html>

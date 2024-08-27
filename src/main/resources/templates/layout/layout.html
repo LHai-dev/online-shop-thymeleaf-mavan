@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en"      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="~{::title}">Default Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" th:href="@{/input.css}">
+</head>
+<body>
+<header>
+    <!-- Common header content -->
+    <h1>Welcome to My Site</h1>
+</header>
+
+<main layout:fragment="page-content">
+    <!-- Default content goes here -->
+    <p>This is the default content.</p>
+</main>
+
+<footer>
+    <!-- Common footer content -->
+    <p>Footer goes here</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Products</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Optional: FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 lg:px-8">
+    <div class="container mx-auto mt-12">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Products</h1>
+            <div class="space-x-4">
+                <a th:href="@{/products/create}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Create New Product
+                </a>
+                <a th:href="@{/categories/create}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Create New Categories
+                </a>
+            </div>
+        </div>
+
+        <!-- Include Alert Fragment -->
+        <div th:replace="fragments/alerts :: alert(${message})"></div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="p-6">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Images</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="product : ${products}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${product.name}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${product.category.name}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${product.price != null ? product.price : 'N/A'}"></td>
+
+                        <!-- Images Column -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div th:if="${product.images != null and !#lists.isEmpty(product.images)}" class="flex space-x-2">
+                                <div th:each="image : ${product.images}" class="inline-block">
+                                    <img th:src="@{'/files/' + ${image}}" alt="Product Image"
+                                         class="max-w-24 max-h-24 rounded"/>
+                                </div>
+                            </div>
+                            <div th:if="${product.images == null || #lists.isEmpty(product.images)}">
+                                <span class="text-sm text-gray-500">No images available</span>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <a th:href="@{/products/edit/{id}(id=${product.id})}" class="text-yellow-500 hover:text-yellow-700" >
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button
+                                    class="text-red-500 hover:text-red-700"
+                                    th:data-id="${product.id}"
+                                    th:data-name="${product.name}"
+                                    onclick="openModal(this)">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md mx-auto">
+        <h2 class="text-xl font-semibold mb-4">Delete Product</h2>
+        <p>Are you sure you want to delete <span id="modalProductName" class="font-bold"></span>?</p>
+        <div class="mt-6 flex justify-end space-x-4">
+            <button class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">No</button>
+            <a id="confirmDeleteButton" class="bg-red-500 text-white px-4 py-2 rounded">Yes, Delete</a>
+        </div>
+    </div>
+</div>
+<script>
+    let deleteUrl = '';
+
+    function openModal(button) {
+        const productId = button.getAttribute('data-id');
+        const productName = button.getAttribute('data-name');
+        document.getElementById('modalProductName').textContent = productName;
+        document.getElementById('confirmDeleteButton').setAttribute('href', '/products/delete/' + productId);
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
