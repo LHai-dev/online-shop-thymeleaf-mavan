@@ -17,10 +17,10 @@ public class ColorService {
     public List<Color> getAllColor(){
         return colorRepository.findAll();
     }
-    public Color getColorById(Long id) {
+    public Color getColorById(Byte id) {
         return colorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404)));
     }
-    public List<Color> findAllById(List<Long> ids) {
+    public List<Color> findAllById(List<Byte> ids) {
         return colorRepository.findAllById(ids);
     }
     public void saveColor(Color color) {
@@ -31,7 +31,7 @@ public class ColorService {
         colorRepository.save(color);
     }
 
-    public void deleteColor(Long id) {
+    public void deleteColor(Byte id) {
         colorRepository.deleteById(id);
     }
 }

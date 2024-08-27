@@ -42,7 +42,7 @@
                         <span class="text-sm text-gray-500">No images available</span>
                     </div>
                     <div th:if="${product.images != null && !#lists.isEmpty(product.images)}" class="aspect-square w-full overflow-hidden bg-neutral-100">
-                        <img th:src="${product.images[0]}"
+                        <img th:src="@{${product.images[0]}}"
                              th:alt="${product.name}"
                              class="group-hover:rotate hover-perspective w-full bg-neutral-100 object-cover object-center transition-opacity group-hover:opacity-75"
                         />

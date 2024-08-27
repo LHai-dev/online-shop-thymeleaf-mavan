@@ -1,0 +1,10 @@
+services:
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./src/main/resources/static/file:/app/src/main/resources/static/file
+    restart: always

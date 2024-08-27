@@ -28,11 +28,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String resolvedPath = "file:" + serverPath;
         registry.addResourceHandler(fileClientPath)
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations("classpath:/templates/")
-                .addResourceLocations("file:" + serverPath);
+                .addResourceLocations(resolvedPath);
     }
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login");

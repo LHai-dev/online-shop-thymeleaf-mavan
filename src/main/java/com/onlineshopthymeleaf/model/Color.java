@@ -15,7 +15,7 @@ import java.util.List;
 public class Color {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Byte id;
 
     private String name;
 

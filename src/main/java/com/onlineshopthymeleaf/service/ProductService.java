@@ -3,6 +3,7 @@ package com.onlineshopthymeleaf.service;
 
 import com.onlineshopthymeleaf.model.Product;
 import com.onlineshopthymeleaf.repository.ProductRepository;
+import com.onlineshopthymeleaf.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +17,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final FilesStorageService filesStorageService;
-
+    private final FileUtil fileUtil;
     public List<Product> findAll() {
         return productRepository.findAll();
     }
 
-    public Product findById(Long id) {
+    public Product findById(Byte id) {
         return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
@@ -30,12 +30,12 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Byte id) {
         Product product = findById(id);
         // Delete associated images from the storage
         if (product.getImages() != null) {
             for (String imageName : product.getImages()) {
-                filesStorageService.delete(imageName);
+                fileUtil.deleteByName(imageName);
             }
             product.setImages(new ArrayList<>()); // Clear the images list if needed (optional)
         }
@@ -43,7 +43,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public List<String> imagesProduct(Long id) {
+    public List<String> imagesProduct(Byte id) {
         findById(id);
         return productRepository.findImagesByProductId(id);
     }

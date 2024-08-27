@@ -35,13 +35,13 @@ public class CategoryController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCategoryForm(@PathVariable Long id, Model model) {
+    public String editCategoryForm(@PathVariable Byte id, Model model) {
         model.addAttribute("category", categoryService.findById(id));
         return "redirect:/admin/create-cc";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable Long id) {
+    public String deleteCategory(@PathVariable Byte id) {
         categoryService.deleteById(id);
         return "redirect:/admin/create-cc";
     }

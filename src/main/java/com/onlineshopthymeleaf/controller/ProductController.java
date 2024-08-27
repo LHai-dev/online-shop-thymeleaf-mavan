@@ -1,12 +1,13 @@
 package com.onlineshopthymeleaf.controller;
 
 import com.onlineshopthymeleaf.model.Color;
+import com.onlineshopthymeleaf.model.FileDto;
 import com.onlineshopthymeleaf.model.Product;
 import com.onlineshopthymeleaf.model.Size;
 import com.onlineshopthymeleaf.service.CategoryService;
 import com.onlineshopthymeleaf.service.ColorService;
-import com.onlineshopthymeleaf.service.FilesStorageService;
 import com.onlineshopthymeleaf.service.ProductService;
+import com.onlineshopthymeleaf.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -29,7 +29,7 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ColorService colorService;
-    private final FilesStorageService filesStorageService;
+    private final FileUtil fileUtil;
     private static final int PAGE_SIZE = 2; // Number of items per page
 
     @GetMapping("/admin/products")
@@ -69,6 +69,7 @@ public class ProductController {
                               Model model) {
 
         List<String> imageNames = new ArrayList<>();
+        List<String> errorMessages = new ArrayList<>();
 
         // Validate selected sizes
         if (selectedSizes == null || selectedSizes.isEmpty()) {
@@ -82,16 +83,23 @@ public class ProductController {
         }
 
         // Process the uploaded files
-        if (files != null && files.length > 0 && !files[0].isEmpty()) {
-            Arrays.stream(files).forEach(file -> {
-                try {
-                    String fileName = filesStorageService.save(file);  // Save the file and get its name
-                    imageNames.add("/files/"+fileName);  // Add file name to the list
-                } catch (Exception e) {
-                    model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
-                    return;
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    try {
+                        FileDto fileDto = fileUtil.upload(file);  // Save the file and get its FileDto
+                        imageNames.add(fileDto.fileLocation());  // Add file location URL to the list
+                    } catch (Exception e) {
+                        errorMessages.add("Failed to upload file: " + file.getOriginalFilename());
+                    }
                 }
-            });
+            }
+        }
+
+        // Handle errors if any file upload failed
+        if (!errorMessages.isEmpty()) {
+            model.addAttribute("message", String.join("; ", errorMessages));
+            return "redirect:/admin/products/create";  // Return to the form with an error message
         }
 
         // Set the sizes to the product
@@ -107,8 +115,9 @@ public class ProductController {
     }
 
 
+
     @GetMapping("/admin/products/edit/{id}")
-    public String editProductForm(@PathVariable Long id, Model model) {
+    public String editProductForm(@PathVariable Byte id, Model model) {
         model.addAttribute("product", productService.findById(id));
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("availableColors", colorService.getAllColor());
@@ -118,7 +127,7 @@ public class ProductController {
     }
 
     @GetMapping("/admin/products/delete/{id}")
-    public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteProduct(@PathVariable Byte id, RedirectAttributes redirectAttributes) {
         try {
             productService.deleteById(id);
             redirectAttributes.addFlashAttribute("message", "Product deleted successfully.");
@@ -130,7 +139,7 @@ public class ProductController {
 
 
     @GetMapping("/products/{id}")
-    public String getProductById(@PathVariable Long id, Model model) {
+    public String getProductById(@PathVariable Byte id, Model model) {
         Product product = productService.findById(id);
         List<String> images = productService.imagesProduct(id); // Assume this service returns the list of image filenames for the product
 
@@ -143,11 +152,11 @@ public class ProductController {
 
 
     @PostMapping("/admin/products/update/{id}")
-    public String updateProduct(@PathVariable("id") Long id,
+    public String updateProduct(@PathVariable("id") Byte id,
                                 @ModelAttribute("product") Product product,
                                 @RequestParam(value = "files", required = false) MultipartFile[] files,
                                 @RequestParam(value = "sizes", required = false) List<Size> selectedSizes,
-                                @RequestParam(value = "colors", required = false) List<Long> selectedColorIds,
+                                @RequestParam(value = "colors", required = false) List<Byte> selectedColorIds,
                                 Model model) {
         Product existingProduct = productService.findById(id);
         if (existingProduct == null) {
@@ -160,16 +169,20 @@ public class ProductController {
             imageNames.addAll(existingProduct.getImages());
         }
 
-        if (files != null && files.length > 0 && !files[0].isEmpty()) {
-            Arrays.stream(files).forEach(file -> {
-                try {
-                    String fileName = filesStorageService.save(file);
-                    imageNames.add(fileName);
-                } catch (Exception e) {
-                    model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    try {
+                        FileDto fileDto = fileUtil.upload(file);  // Upload the file and get FileDto
+                        imageNames.add(fileDto.fileLocation());  // Add the file location (URL) to imageNames
+                    } catch (Exception e) {
+                        model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
+                        break;  // Optionally, stop processing if one file fails
+                    }
                 }
-            });
+            }
         }
+
 
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());

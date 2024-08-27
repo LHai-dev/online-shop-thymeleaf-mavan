@@ -41,8 +41,6 @@ WORKDIR /app
 # Switch to the app user
 USER $APPLICATION_USER
 
-COPY src/main/resources/static/file /app/file
-
 # Expose the application's port
 EXPOSE 9090
 

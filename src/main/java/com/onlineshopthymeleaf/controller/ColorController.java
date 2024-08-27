@@ -36,21 +36,21 @@ public class ColorController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editColorForm(@PathVariable Long id, Model model) {
+    public String editColorForm(@PathVariable Byte id, Model model) {
         Color color = colorService.getColorById(id);
         model.addAttribute("color", color);
         return "redirect:/admin/create-cc";
     }
 
     @PostMapping("/update/{id}")
-    public String updateColor(@PathVariable Long id, @ModelAttribute("color") Color color) {
+    public String updateColor(@PathVariable Byte id, @ModelAttribute("color") Color color) {
         color.setId(id);
         colorService.saveColor(color);
         return "redirect:/admin/create-cc";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteColor(@PathVariable Long id) {
+    public String deleteColor(@PathVariable Byte id) {
         colorService.deleteColor(id);
         return "redirect:/admin/colors";
     }

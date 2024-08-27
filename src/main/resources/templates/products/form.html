@@ -86,7 +86,7 @@
                                 <label class="block text-sm font-medium text-gray-700">Current Product Images:</label>
                                 <div class="mt-2 flex flex-wrap">
                                     <div th:if="${product.images != null}" th:each="image : ${product.images}" class="inline-block mr-2">
-                                        <img th:src="@{/file/} + ${image}" alt="Product Image"
+                                        <img th:src="${image}" alt="Product Image"
                                              class="w-20 h-20 object-cover rounded-md border border-gray-300"/>
                                         <input type="hidden" name="existingImages" th:value="${image}"/>
                                     </div>
