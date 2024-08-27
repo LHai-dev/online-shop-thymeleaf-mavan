@@ -1,4 +1,4 @@
-package com.model;
+package com.onlineshopthymeleaf.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,23 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-    // Getter for 'id'
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Getter and Setter for 'name'
     private String name;
 
     private String description;
 
-    // Getter and Setter for 'category'
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-
-    // Getter and Setter for 'price'
     private Double price;
 
     @ElementCollection
@@ -37,4 +32,17 @@ public class Product {
     @Column(name = "image")
     private List<String> images = new ArrayList<>();
 
+    @ElementCollection(targetClass = Size.class)
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "size")
+    private List<Size> sizes = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "product_colors",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "color_id")
+    )
+    private List<Color> colors = new ArrayList<>();
 }

@@ -1,6 +1,6 @@
-package com.repository;
+package com.onlineshopthymeleaf.repository;
 
-import com.example.sa.model.Category;
+import com.onlineshopthymeleaf.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 // CategoryRepository.java

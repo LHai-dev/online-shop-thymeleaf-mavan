@@ -1,12 +1,16 @@
-package com.service;
+package com.onlineshopthymeleaf.service;
 
-import com.example.sa.model.Product;
-import com.example.sa.repository.ProductRepository;
+
+import com.onlineshopthymeleaf.model.Product;
+import com.onlineshopthymeleaf.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,4 +47,13 @@ public class ProductService {
         findById(id);
         return productRepository.findImagesByProductId(id);
     }
+
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
+
+    public Page<Product> searchProducts(String name, Pageable pageable) {
+        return productRepository.findByNameContaining(name, pageable);
+    }
 }
+

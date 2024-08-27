@@ -1,7 +1,8 @@
-package com.controller;
+package com.onlineshopthymeleaf.controller;
 
-import com.example.sa.model.FileInfo;
-import com.example.sa.service.FilesStorageService;
+
+import com.onlineshopthymeleaf.model.FileInfo;
+import com.onlineshopthymeleaf.service.FilesStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -26,11 +27,6 @@ import java.util.stream.Collectors;
 public class FileController {
 
   private final FilesStorageService storageService;
-
-
-
-
-
   @PostMapping("/files/upload")
   public String uploadFiles(Model model, @RequestParam("files") MultipartFile[] files) {
     List<String> messages = new ArrayList<>();
@@ -46,7 +42,7 @@ public class FileController {
 
     model.addAttribute("messages", messages);
 
-    return "upload_form";
+    return "Hello";
   }
 
   @GetMapping("/files")

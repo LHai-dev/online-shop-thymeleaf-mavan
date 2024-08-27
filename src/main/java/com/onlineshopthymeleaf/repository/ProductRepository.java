@@ -1,6 +1,8 @@
-package com.repository;
+package com.onlineshopthymeleaf.repository;
 
-import com.example.sa.model.Product;
+import com.onlineshopthymeleaf.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,4 +13,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images")
     List<Product> findAllWithImages();
     @Query("SELECT pi.images FROM Product pi WHERE pi.id = :productId")
-    List<String> findImagesByProductId(@Param("productId") Long productId);}
+    List<String> findImagesByProductId(@Param("productId") Long productId);
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name%")
+    List<Product> findByNameContaining(@Param("name") String name);
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name%")
+    Page<Product> findByNameContaining(@Param("name") String name, Pageable pageable);
+
+}

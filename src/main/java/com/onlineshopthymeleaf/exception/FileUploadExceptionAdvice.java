@@ -1,4 +1,4 @@
-package com.exception;
+package com.onlineshopthymeleaf.exception;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

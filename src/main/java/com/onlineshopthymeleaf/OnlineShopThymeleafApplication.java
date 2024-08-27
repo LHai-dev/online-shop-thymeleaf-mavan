@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OnlineShopThymeleafApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OnlineShopThymeleafApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OnlineShopThymeleafApplication.class, args);
+    }
 
 }

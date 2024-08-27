@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/layout/layoyt-admin}">
+      layout:decorate="~{layout/layoyt-admin}">
 <head>
     <meta charset="UTF-8">
-    <title>index first one</title>
+    <title>Index First One</title>
 </head>
-<body>
+<body class="bg-gray-100">
 
-<main layout:fragment="content" >
+<main layout:fragment="content">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/slidernav :: side}" class="w-1/4 bg-white shadow-md"></div>
 
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col p-6 gap-6">
+            <div th:replace="~{fragments/pie-chart}" class="w-full"></div>
+        </div>
+    </div>
 </main>
 
 </body>

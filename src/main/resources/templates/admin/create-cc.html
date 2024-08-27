@@ -1,10 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layoyt-admin}">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Admin</title>
 </head>
 <body>
-$END$
+
+<main layout:fragment="content">
+
+  <div class="flex h-screen">
+
+    <div th:replace="~{fragments/slidernav :: side}"></div>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 bg-gray-100">
+      <!-- Your main content goes here -->
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+
+          <!-- Categories Section -->
+          <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Categories</h2>
+                <button onclick="openModal('category-create')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center">
+                  <i class="fas fa-plus mr-2"></i> Create New
+                </button>
+              </div>
+              <ul class="divide-y divide-gray-200">
+                <li th:each="category : ${categories}" class="py-4 flex justify-between items-center hover:bg-gray-50 transition ease-in-out duration-150">
+                  <span class="text-gray-800 font-medium" th:text="${category.name}"></span>
+                  <div class="flex space-x-4">
+                    <a onclick="openModal('category-edit', '${category.id}', '${category.name}')" class="text-yellow-500 hover:text-yellow-600 font-medium">
+                      <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                    <a th:href="@{/admin/categories/delete/{id}(id=${category.id})}" class="text-red-500 hover:text-red-600 font-medium">
+                      <i class="fas fa-trash-alt mr-1"></i> Delete
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Colors Section -->
+          <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Colors</h2>
+                <button onclick="openModal('color-create')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center">
+                  <i class="fas fa-plus mr-2"></i> Add New
+                </button>
+              </div>
+              <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead>
+                <tr class="bg-gray-50">
+                  <th class="py-3 px-4 text-left text-sm font-medium text-gray-600">ID</th>
+                  <th class="py-3 px-4 text-left text-sm font-medium text-gray-600">Name</th>
+                  <th class="py-3 px-4 text-left text-sm font-medium text-gray-600">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                <tr th:each="color : ${colors}" class="hover:bg-gray-50 transition ease-in-out duration-150">
+                  <td class="py-3 px-4 text-gray-800" th:text="${color.id}"></td>
+                  <td class="py-3 px-4 text-gray-800" th:text="${color.name}"></td>
+                  <td class="py-3 px-4">
+                    <div class="flex space-x-4">
+                      <a onclick="openModal('color-edit', '${color.id}', '${color.name}')" class="text-yellow-500 hover:text-yellow-600 font-medium">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                      </a>
+                      <a th:href="@{/admin/colors/delete/{id}(id=${color.id})}" class="text-red-500 hover:text-red-600 font-medium">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Create/Edit Modal -->
+        <div id="modal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+          <div class="modal-backdrop absolute inset-0"></div>
+          <div class="bg-white rounded-lg overflow-hidden shadow-lg max-w-lg w-full z-10">
+            <div class="p-6">
+              <h2 id="modalTitle" class="text-2xl font-bold mb-6 text-gray-800"></h2>
+              <form id="modalForm" method="post">
+                <input type="hidden" id="modalIdField" />
+                <div class="mb-6">
+                  <label for="modalNameField" class="block text-sm font-medium text-gray-700">Name:</label>
+                  <input type="text" id="modalNameField" name="name" placeholder="Enter name" required
+                         class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"/>
+                </div>
+                <div class="flex justify-end space-x-4">
+                  <button type="button" onclick="closeModal()"
+                          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+</main>
+
 </body>
 </html>
+
+
+<script>
+  function openModal(type, id = null, name = '') {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalForm = document.getElementById('modalForm');
+    const modalIdField = document.getElementById('modalIdField');
+    const modalNameField = document.getElementById('modalNameField');
+
+    modalIdField.value = id || '';
+    modalNameField.value = name || '';
+
+    if (type === 'category-create') {
+      modalTitle.innerText = 'Create Category';
+      modalForm.action = '/admin/categories/save';
+    } else if (type === 'category-edit') {
+      modalTitle.innerText = 'Edit Category';
+      modalForm.action = `/admin/categories/edit/${id}`;
+    } else if (type === 'color-create') {
+      modalTitle.innerText = 'Create Color';
+      modalForm.action = '/admin/colors/save';
+    } else if (type === 'color-edit') {
+      modalTitle.innerText = 'Edit Color';
+      modalForm.action = `/admin/colors/edit/${id}`;
+    }
+
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.add('hidden');
+  }
+</script>

@@ -1,4 +1,4 @@
-package com.model;
+package com.onlineshopthymeleaf.model;
 
 import lombok.Getter;
 

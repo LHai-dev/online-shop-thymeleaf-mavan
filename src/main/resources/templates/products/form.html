@@ -1,114 +1,129 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layoyt-admin}">
 <head>
-    <title>Create/Edit Product</title>
-    <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Added for responsiveness -->
+    <title>CREATE - PRODUCT</title>
 </head>
 <body>
-<section class="my-12">
-    <div class="container mx-auto">
-        <div class="flex justify-center">
-            <div class="w-full max-w-lg">
-                <h2 class="text-2xl font-semibold mb-6" th:text="${product.id != null} ? 'Edit Product' : 'Create Product'">Create/Edit Product</h2>
 
-                <!-- Product Form -->
-                <form th:action="@{${product.id != null} ? '/products/update/' + ${product.id} : '/products/save'}" th:object="${product}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" th:field="*{id}"/>
+<main layout:fragment="content">
+    <div class="flex full-screen bg-gray-100">
+        <div th:replace="~{fragments/slidernav :: side}" class="w-64"></div>
 
-                    <!-- Product Name -->
-                    <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
-                        <input type="text" th:field="*{name}" id="name" placeholder="Product Name" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"/>
-                    </div>
+        <section class="flex-1 p-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-center">
+                    <div class="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6" th:text="${product.id != null} ? 'Edit Product' : 'Create Product'">Create/Edit Product</h2>
 
-                    <!-- Category Selection -->
-                    <div class="mb-4">
-                        <label for="category" class="block text-sm font-medium text-gray-700">Category:</label>
-                        <select th:field="*{category.id}" id="category" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                            <option value="" disabled selected>Select a Category</option>
-                            <option th:each="category : ${categories}"
-                                    th:value="${category.id}"
-                                    th:text="${category.name}">
-                            </option>
-                        </select>
-                    </div>
+                        <!-- Product Form -->
+                        <form th:action="@{${product.id != null} ? '/admin/products/update/' + ${product.id} : '/admin/products/save'}"
+                              th:object="${product}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" th:field="*{id}"/>
 
-                    <!-- Product Price -->
-                    <div class="mb-4">
-                        <label for="price" class="block text-sm font-medium text-gray-700">Price:</label>
-                        <input type="number" th:field="*{price}" id="price" placeholder="Product Price" required min="0"
-                               step="0.01"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"/>
-                    </div>
+                            <!-- Product Name -->
+                            <div class="mb-4">
+                                <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
+                                <input type="text" th:field="*{name}" id="name" placeholder="Product Name" required
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"/>
+                                <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-red-600 text-sm"></div>
+                            </div>
 
+                            <!-- Sizes Selection -->
+                            <div class="mb-4">
+                                <label for="sizes" class="block text-sm font-medium text-gray-700">Sizes:</label>
+                                <select th:field="*{sizes}" id="sizes" multiple
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option th:each="size : ${availableSizes}"
+                                            th:value="${size}" th:text="${size}">
+                                    </option>
+                                </select>
+                            </div>
 
-                    <!-- Product Description -->
-                    <div class="mb-4">
-                        <label for="description" class="block text-sm font-medium text-gray-700">Product Description:</label>
-                        <textarea th:field="*{description}" id="description" rows="5" cols="33"
-                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                  placeholder="Enter product description..."></textarea>
-                    </div>
+                            <!-- Colors Selection -->
+                            <div class="mb-4">
+                                <label for="colors" class="block text-sm font-medium text-gray-700">Colors:</label>
+                                <select th:field="*{colors}" id="colors" multiple
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option th:each="color : ${availableColors}"
+                                            th:value="${color.id}" th:text="${color.name}">
+                                    </option>
+                                </select>
+                            </div>
 
-                    <!-- Display Existing Product Images -->
-                    <div class="mb-4" th:if="${product.id != null}">
-                        <label class="block text-sm font-medium text-gray-700">Current Product Images:</label>
-                        <div class="mt-2">
-                            <div th:if="${product.images != null}">
-                                <div th:each="image : ${product.images}" class="inline-block mr-2">
-                                    <img th:src="@{/file/} + ${image}" alt="Product Image" class="w-20 h-20 object-cover rounded border border-gray-300"/>
-                                    <!-- Hidden input to pass existing image names back to the server -->
-                                    <input type="hidden" name="existingImages" th:value="${image}"/>
+                            <!-- Category Selection -->
+                            <div class="mb-4">
+                                <label for="category" class="block text-sm font-medium text-gray-700">Category:</label>
+                                <select th:field="*{category.id}" id="category" required
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option value="" disabled selected>Select a Category</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Product Price -->
+                            <div class="mb-4">
+                                <label for="price" class="block text-sm font-medium text-gray-700">Price:</label>
+                                <input type="number" th:field="*{price}" id="price" placeholder="Product Price" required min="0"
+                                       step="0.01"
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"/>
+                            </div>
+
+                            <!-- Product Description -->
+                            <div class="mb-4">
+                                <label for="description" class="block text-sm font-medium text-gray-700">Product Description:</label>
+                                <textarea th:field="*{description}" id="description" rows="5"
+                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                          placeholder="Enter product description..."></textarea>
+                            </div>
+
+                            <!-- Display Existing Product Images -->
+                            <div class="mb-4" th:if="${product.id != null}">
+                                <label class="block text-sm font-medium text-gray-700">Current Product Images:</label>
+                                <div class="mt-2 flex flex-wrap">
+                                    <div th:if="${product.images != null}" th:each="image : ${product.images}" class="inline-block mr-2">
+                                        <img th:src="@{/file/} + ${image}" alt="Product Image"
+                                             class="w-20 h-20 object-cover rounded-md border border-gray-300"/>
+                                        <input type="hidden" name="existingImages" th:value="${image}"/>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-
-                    <!-- Upload New Images -->
-                    <div class="mb-4" >
-                        <label class="mb-[10px] block text-base font-medium text-dark dark:text-white">
-                            Attachments
-                        </label>
-                        <div class="relative">
-                            <label for="images" class="flex min-h-[175px] w-full cursor-pointer items-center justify-center rounded-md border border-dashed border-primary p-6">
-                                <div>
-                                    <input type="file" id="images" name="files" class="sr-only" multiple accept="image/*">
-                                    <span class="mx-auto mb-3 flex h-[50px] w-[50px] items-center justify-center rounded-full border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2">
-                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M2.5013 11.666C2.96154 11.666 3.33464 12.0391 3.33464 12.4993V15.8327C3.33464 16.0537 3.42243 16.2657 3.57871 16.4219C3.73499 16.5782 3.94695 16.666 4.16797 16.666H15.8346C16.0556 16.666 16.2676 16.5782 16.4239 16.4219C16.5802 16.2657 16.668 16.0537 16.668 15.8327V12.4993C16.668 12.0391 17.0411 11.666 17.5013 11.666C17.9615 11.666 18.3346 12.0391 18.3346 12.4993V15.8327C18.3346 16.4957 18.0712 17.1316 17.6024 17.6004C17.1336 18.0693 16.4977 18.3327 15.8346 18.3327H4.16797C3.50493 18.3327 2.86904 18.0693 2.4002 17.6004C1.93136 17.1316 1.66797 16.4957 1.66797 15.8327V12.4993C1.66797 12.0391 2.04106 11.666 2.5013 11.666Z" fill="#3056D3"></path>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.41074 1.91009C9.73618 1.58466 10.2638 1.58466 10.5893 1.91009L14.7559 6.07676C15.0814 6.4022 15.0814 6.92984 14.7559 7.25527C14.4305 7.58071 13.9028 7.58071 13.5774 7.25527L10 3.67786L6.42259 7.25527C6.09715 7.58071 5.56951 7.58071 5.24408 7.25527C4.91864 6.92984 4.91864 6.4022 5.24408 6.07676L9.41074 1.91009Z" fill="#3056D3"></path>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.0013 1.66602C10.4615 1.66602 10.8346 2.03911 10.8346 2.49935V12.4994C10.8346 12.9596 10.4615 13.3327 10.0013 13.3327C9.54106 13.3327 9.16797 12.9596 9.16797 12.4994V2.49935C9.16797 2.03911 9.54106 1.66602 10.0013 1.66602Z" fill="#3056D3"></path>
-                     </svg>
-                  </span>
-                                    <span class="text-base text-body-color dark:text-dark-6">
-                  Drag &amp; drop or
-                  <span class="text-primary underline"> browse </span>
-                  </span>
+                            <!-- File Upload -->
+                            <div class="mt-4 mb-6">
+                                <div class="max-w-md mx-auto h-40 rounded-lg border-2 border-dashed flex items-center justify-center">
+                                    <label for="images" class="cursor-pointer text-center p-4 md:p-8">
+                                        <svg class="w-10 h-10 mx-auto text-blue-600" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12.1667 26.6667C8.48477 26.6667 5.5 23.6819 5.5 20C5.5 16.8216 7.72428 14.1627 10.7012 13.4949C10.5695 12.9066 10.5 12.2947 10.5 11.6667C10.5 7.0643 14.231 3.33334 18.8333 3.33334C22.8655 3.33334 26.2288 6.19709 27.0003 10.0016C27.0556 10.0006 27.1111 10 27.1667 10C31.769 10 35.5 13.731 35.5 18.3333C35.5 22.3649 32.6371 25.7279 28.8333 26.5M25.5 21.6667L20.5 16.6667M20.5 16.6667L15.5 21.6667M20.5 16.6667L20.5 36.6667" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <p class="mt-3 text-gray-700 max-w-xs mx-auto">Click to <span class="font-medium text-indigo-600">Upload your file</span> or drag and drop your file here</p>
+                                    </label>
+                                    <input type="file" id="images" name="files" class="sr-only" multiple accept="image/*"/>
                                 </div>
-                            </label>
-                        </div>
-                    </div>
+                            </div>
 
-                    <!-- Submit and Back Buttons -->
-                    <div class="flex justify-between">
-                        <button type="submit"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Save
-                        </button>
-                        <a th:href="@{/products}"
-                           class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                            Back to List
-                        </a>
+                            <!-- Submit and Back Buttons -->
+                            <div class="flex justify-between">
+                                <button type="submit"
+                                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    Save
+                                </button>
+                                <a th:href="@{/admin/products}"
+                                   class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Back to List
+                                </a>
+                            </div>
+                        </form>
                     </div>
-                </form>
-
+                </div>
             </div>
-        </div>
+        </section>
     </div>
-</section>
+</main>
+
 </body>
 </html>

@@ -1,11 +1,17 @@
-package com.controller;
+package com.onlineshopthymeleaf.controller;
 
-import com.example.sa.model.Product;
-import com.example.sa.service.CategoryService;
-import com.example.sa.service.FilesStorageService;
-import com.example.sa.service.ProductService;
+import com.onlineshopthymeleaf.model.Color;
+import com.onlineshopthymeleaf.model.Product;
+import com.onlineshopthymeleaf.model.Size;
+import com.onlineshopthymeleaf.service.CategoryService;
+import com.onlineshopthymeleaf.service.ColorService;
+import com.onlineshopthymeleaf.service.FilesStorageService;
+import com.onlineshopthymeleaf.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,34 +23,58 @@ import java.util.Arrays;
 import java.util.List;
 
 @Controller
-@RequestMapping("/products")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final ColorService colorService;
     private final FilesStorageService filesStorageService;
+    private static final int PAGE_SIZE = 2; // Number of items per page
 
-    @GetMapping
-    public String listProducts(Model model) {
-        model.addAttribute("products", productService.findAll());
+    @GetMapping("/admin/products")
+    public String listProducts(@RequestParam(value = "name", required = false, defaultValue = "") String name,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               Model model) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<Product> products;
+        if (name.isEmpty()) {
+            products = productService.findAll(pageable);
+        } else {
+            products = productService.searchProducts(name, pageable);
+        }
+        model.addAttribute("products", products);
+        model.addAttribute("searchTerm", name); // For retaining the search term in the input box
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", products.getTotalPages());
+        model.addAttribute("totalItems", products.getTotalElements());
         return "products/list";
     }
 
 
-    @GetMapping("/create")
+    @GetMapping("/admin/products/create")
     public String createProductForm(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("availableColors", colorService.getAllColor());
+        model.addAttribute("availableSizes", Size.values());  // For enum Size
         return "products/form";
     }
-    @PostMapping("/save")
+
+    @PostMapping("/admin/products/save")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam(value = "files", required = false) MultipartFile[] files,
                               @RequestParam(value = "existingImages", required = false) List<String> existingImages,
+                              @RequestParam(value = "sizes", required = false) List<Size> selectedSizes,
                               Model model) {
 
         List<String> imageNames = new ArrayList<>();
+
+        // Validate selected sizes
+        if (selectedSizes == null || selectedSizes.isEmpty()) {
+            model.addAttribute("message", "Please select at least one size.");
+            return "redirect:/admin/products/create";  // Return to the form with an error message
+        }
 
         // Add existing images to the list
         if (existingImages != null) {
@@ -56,7 +86,7 @@ public class ProductController {
             Arrays.stream(files).forEach(file -> {
                 try {
                     String fileName = filesStorageService.save(file);  // Save the file and get its name
-                    imageNames.add(fileName);  // Add file name to the list
+                    imageNames.add("/files/"+fileName);  // Add file name to the list
                 } catch (Exception e) {
                     model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
                     return;
@@ -64,24 +94,30 @@ public class ProductController {
             });
         }
 
+        // Set the sizes to the product
+        product.setSizes(selectedSizes);
+
         // Set the images to the product
         product.setImages(imageNames);
 
-        // Save the product with images
+        // Save the product with images and sizes
         productService.save(product);
 
-        return "redirect:/products";
+        return "redirect:/admin/products";
     }
 
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/admin/products/edit/{id}")
     public String editProductForm(@PathVariable Long id, Model model) {
         model.addAttribute("product", productService.findById(id));
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("availableColors", colorService.getAllColor());
+        model.addAttribute("availableSizes", Size.values());  // For enum Size
+
         return "products/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/admin/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             productService.deleteById(id);
@@ -89,11 +125,11 @@ public class ProductController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message", "Error occurred while trying to delete the product.");
         }
-        return "redirect:/products";
+        return "redirect:/admin/products";
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/products/{id}")
     public String getProductById(@PathVariable Long id, Model model) {
         Product product = productService.findById(id);
         List<String> images = productService.imagesProduct(id); // Assume this service returns the list of image filenames for the product
@@ -106,42 +142,53 @@ public class ProductController {
     }
 
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/admin/products/update/{id}")
     public String updateProduct(@PathVariable("id") Long id,
                                 @ModelAttribute("product") Product product,
                                 @RequestParam(value = "files", required = false) MultipartFile[] files,
+                                @RequestParam(value = "sizes", required = false) List<Size> selectedSizes,
+                                @RequestParam(value = "colors", required = false) List<Long> selectedColorIds,
                                 Model model) {
         Product existingProduct = productService.findById(id);
         if (existingProduct == null) {
-            return "redirect:/products";
+            return "redirect:/admin/products";
         }
 
         List<String> imageNames = new ArrayList<>();
 
-        // Add existing images if not null
         if (existingProduct.getImages() != null) {
             imageNames.addAll(existingProduct.getImages());
         }
 
-        // Process new uploaded files
         if (files != null && files.length > 0 && !files[0].isEmpty()) {
             Arrays.stream(files).forEach(file -> {
                 try {
-                    String fileName = filesStorageService.save(file);  // Save the file and get its name
-                    imageNames.add(fileName);  // Add file name to the list
+                    String fileName = filesStorageService.save(file);
+                    imageNames.add(fileName);
                 } catch (Exception e) {
                     model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
                 }
             });
         }
-        // Update the product with the new data
+
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setPrice(product.getPrice());
         existingProduct.setImages(imageNames);
-        // ... update other fields as necessary
+
+        if (selectedSizes != null && !selectedSizes.isEmpty()) {
+            existingProduct.setSizes(selectedSizes);
+        }
+
+        if (selectedColorIds != null && !selectedColorIds.isEmpty()) {
+            List<Color> selectedColors = colorService.findAllById(selectedColorIds);
+            existingProduct.setColors(selectedColors);
+        }
+
         productService.save(existingProduct);
 
-        return "redirect:/products";
+        return "redirect:/admin/products";
     }
+
+
 }

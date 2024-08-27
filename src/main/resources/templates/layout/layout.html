@@ -1,29 +1,22 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      lang="en"      lang="en">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title th:replace="~{::title}">Default Title</title>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">online-shop</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="icon" th:href="@{/file/vite.svg}">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" th:href="@{/input.css}">
+    <link href="/main.css" th:href="@{/main.css}" rel="stylesheet"/>
 </head>
 <body>
-<header>
-    <!-- Common header content -->
-    <h1>Welcome to My Site</h1>
+
+<header class="pb-6 bg-white lg:pb-0" th:replace="~{fragments/navbar.html}">
+    <!-- Navbar fragment included here -->
 </header>
 
-<main layout:fragment="page-content">
-    <!-- Default content goes here -->
-    <p>This is the default content.</p>
-</main>
+<section class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 sm:px-6 lg:px-8" layout:fragment="content">
+    <p>Default content, will be replaced by specific page content.</p>
+</section>
 
-<footer>
-    <!-- Common footer content -->
-    <p>Footer goes here</p>
-</footer>
 </body>
 </html>

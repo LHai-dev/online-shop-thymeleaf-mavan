@@ -1,6 +1,3 @@
-LABEL authors="Hai"
-
-# First stage, build the custom JRE
 FROM eclipse-temurin:17-jdk-alpine AS jre-builder
 
 # Install binutils, required by jlink
@@ -44,13 +41,10 @@ WORKDIR /app
 # Switch to the app user
 USER $APPLICATION_USER
 
-# Expose the application's port
-EXPOSE 8080
-# Dockerfile
-# Use environment variables for database connection
-ENV SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3307/dd_db"
-ENV SPRING_DATASOURCE_USERNAME="admin"
-ENV SPRING_DATASOURCE_PASSWORD="admin1234"
+COPY src/main/resources/static/file /app/file
 
-# ENTRYPOINT with environment variables
-ENTRYPOINT ["sh", "-c", "java -jar /app/app.jar --spring.datasource.url=$SPRING_DATASOURCE_URL --spring.datasource.username=$SPRING_DATASOURCE_USERNAME --spring.datasource.password=$SPRING_DATASOURCE_PASSWORD"]
+# Expose the application's port
+EXPOSE 9090
+
+# ENTRYPOINT to run the application
+ENTRYPOINT ["sh", "-c", "java -jar /app/app.jar"]

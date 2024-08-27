@@ -1,7 +1,7 @@
-package com.service;
+package com.onlineshopthymeleaf.service;
 
-import com.example.sa.model.Category;
-import com.example.sa.repository.CategoryRepository;
+import com.onlineshopthymeleaf.model.Category;
+import com.onlineshopthymeleaf.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
