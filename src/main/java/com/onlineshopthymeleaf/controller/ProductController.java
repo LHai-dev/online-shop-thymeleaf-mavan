@@ -168,16 +168,20 @@ public class ProductController {
         if (existingProduct.getImages() != null) {
             imageNames.addAll(existingProduct.getImages());
         }
-
+        // Process new file uploads
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
                     try {
-                        FileDto fileDto = fileUtil.upload(file);  // Upload the file and get FileDto
-                        imageNames.add(fileDto.fileLocation());  // Add the file location (URL) to imageNames
+                        FileDto fileDto = fileUtil.upload(file);
+                        imageNames.add(fileDto.fileLocation());
                     } catch (Exception e) {
-                        model.addAttribute("message", "Failed to upload file: " + file.getOriginalFilename());
-                        break;  // Optionally, stop processing if one file fails
+                        model.addAttribute("errorMessage", "Failed to upload file: " + file.getOriginalFilename());
+                        // Restore previous setup for form re-render
+                        model.addAttribute("categories", categoryService.findAll());
+                        model.addAttribute("availableColors", colorService.getAllColor());
+                        model.addAttribute("availableSizes", Size.values());
+                        return "products/form";
                     }
                 }
             }
